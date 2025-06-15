@@ -2,7 +2,7 @@ import React from "react";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 
 import OnboardScreen from "../onboarding/OnboardScreen"; // create this screen
-import SignIn from "../authScreen/signIn/SignIn";
+import SignIn from "../authScreen/signIn/SIgnIn";
 import SignUp from "../authScreen/signUp/SignUp";
 import BottomTabs from "../../components/bottomTabs/BottomTabs";
 
