@@ -9,4 +9,5 @@ export const Colors = {
   background: "#f5f6fa",
   success: "#00c853",
   danger: "#d63031",
+  black: "#000000", // ← add this line
 };

@@ -1,5 +1,14 @@
 import React from "react";
-import { View, Text, StyleSheet, FlatList } from "react-native";
+import {
+  View,
+  Text,
+  StyleSheet,
+  FlatList,
+  Pressable,
+  Platform,
+  TouchableOpacity,
+} from "react-native";
+import { MaterialIcons } from "@expo/vector-icons";
 
 const leaderboardData = [
   { name: "Ravi", score: 18 },
@@ -9,44 +18,166 @@ const leaderboardData = [
   { name: "You", score: 13 },
 ];
 
-const LeaderboardScreen = () => {
+const LeaderboardScreen = ({ navigation }) => {
+  const renderItem = ({ item, index }) => {
+    const isYou = item.name === "You";
+    const trophyColor =
+      index === 0
+        ? "#FFD700"
+        : index === 1
+        ? "#C0C0C0"
+        : index === 2
+        ? "#CD7F32"
+        : null;
+
+    return (
+      <Pressable
+        style={({ pressed }) => [
+          styles.row,
+          isYou && styles.youRow,
+          { opacity: pressed ? 0.9 : 1 },
+        ]}
+      >
+        <View
+          style={[
+            styles.rankBadge,
+            trophyColor && { backgroundColor: trophyColor },
+          ]}
+        >
+          {index < 3 ? (
+            <MaterialIcons name="emoji-events" size={24} color="#fff" />
+          ) : (
+            <Text style={styles.rank}>#{index + 1}</Text>
+          )}
+        </View>
+        <Text style={[styles.name, isYou && styles.youText]}>{item.name}</Text>
+        <Text style={[styles.score, isYou && styles.youText]}>
+          {item.score}
+        </Text>
+      </Pressable>
+    );
+  };
+
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Leaderboard</Text>
+      {/* Header with navigation icons */}
+      <View style={styles.header}>
+        <View style={styles.headerContent}>
+          <TouchableOpacity
+            onPress={() => navigation.goBack()}
+            style={styles.iconButton}
+          >
+            <MaterialIcons name="arrow-back" size={24} color="#fff" />
+          </TouchableOpacity>
+          <Text style={styles.title}>Leaderboard</Text>
+          <TouchableOpacity
+            onPress={() => navigation.navigate("MainApp")}
+            style={styles.iconButton}
+          >
+            <MaterialIcons name="home" size={24} color="#fff" />
+          </TouchableOpacity>
+        </View>
+      </View>
+
+      {/* Leaderboard list */}
       <FlatList
         data={leaderboardData}
         keyExtractor={(item, index) => index.toString()}
-        renderItem={({ item, index }) => (
-          <View style={styles.row}>
-            <Text style={styles.rank}>#{index + 1}</Text>
-            <Text style={styles.name}>{item.name}</Text>
-            <Text style={styles.score}>{item.score}</Text>
-          </View>
-        )}
+        renderItem={renderItem}
+        contentContainerStyle={styles.listContent}
+        showsVerticalScrollIndicator={false}
       />
     </View>
   );
 };
 
 const styles = StyleSheet.create({
-  container: { flex: 1, padding: 20 },
+  container: {
+    flex: 1,
+    backgroundColor: "#f8f9fa",
+  },
+  header: {
+    backgroundColor: "#0077cc",
+    paddingTop: Platform.OS === "ios" ? 60 : 40,
+    paddingBottom: 20,
+    borderBottomWidth: 1,
+    borderBottomColor: "#005599",
+  },
+  headerContent: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    paddingHorizontal: 20,
+  },
   title: {
-    fontSize: 24,
-    fontWeight: "bold",
-    marginBottom: 20,
+    fontSize: 28,
+    fontWeight: "700",
+    color: "#fff",
+    letterSpacing: 0.5,
     textAlign: "center",
+    flex: 1,
+    marginHorizontal: 12,
+  },
+  iconButton: {
+    padding: 8,
+  },
+  listContent: {
+    paddingHorizontal: 20,
+    paddingBottom: 20,
+    paddingTop: 12,
   },
   row: {
     flexDirection: "row",
-    justifyContent: "space-between",
-    padding: 12,
-    backgroundColor: "#f1f1f1",
-    marginBottom: 8,
-    borderRadius: 8,
+    alignItems: "center",
+    backgroundColor: "#fff",
+    borderRadius: 12,
+    padding: 16,
+    marginBottom: 12,
+    ...Platform.select({
+      ios: {
+        shadowColor: "#000",
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.1,
+        shadowRadius: 4,
+      },
+      android: {
+        elevation: 3,
+      },
+    }),
   },
-  rank: { fontWeight: "bold", width: 40 },
-  name: { flex: 1 },
-  score: { fontWeight: "bold" },
+  youRow: {
+    backgroundColor: "#e6f0ff",
+    borderWidth: 1,
+    borderColor: "#0077cc",
+  },
+  rankBadge: {
+    width: 36,
+    height: 36,
+    borderRadius: 18,
+    backgroundColor: "#B0B0B0",
+    justifyContent: "center",
+    alignItems: "center",
+    marginRight: 12,
+  },
+  rank: {
+    fontSize: 14,
+    fontWeight: "bold",
+    color: "#fff",
+  },
+  name: {
+    flex: 1,
+    fontSize: 16,
+    color: "#333",
+  },
+  score: {
+    fontSize: 16,
+    fontWeight: "600",
+    color: "#333",
+  },
+  youText: {
+    color: "#0077cc",
+    fontWeight: "700",
+  },
 });
 
 export default LeaderboardScreen;
