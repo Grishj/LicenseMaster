@@ -1,0 +1,63 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        String        @id @default(uuid())
+  name      String
+  email     String        @unique
+  image     String?
+  quizzes   QuizAttempt[]
+  createdAt DateTime      @default(now())
+  updatedAt DateTime      @updatedAt
+}
+
+model Category {
+  id          String        @id @default(uuid())
+  name        String        @unique
+  description String?
+  questions   Question[]
+  createdAt   DateTime      @default(now())
+  QuizAttempt QuizAttempt[]
+}
+
+model Question {
+  id             String           @id @default(uuid())
+  text           String
+  options        String[] // array of 4 options
+  answerIndex    Int // 0-based index of correct option
+  explanation    String?
+  categoryId     String
+  category       Category         @relation(fields: [categoryId], references: [id])
+  createdAt      DateTime         @default(now())
+  QuestionRecord QuestionRecord[]
+}
+
+model QuizAttempt {
+  id             String           @id @default(uuid())
+  userId         String
+  user           User             @relation(fields: [userId], references: [id])
+  categoryId     String?
+  category       Category?        @relation(fields: [categoryId], references: [id])
+  questions      QuestionRecord[]
+  totalScore     Float
+  totalAttempted Int
+  correctAnswers Int
+  wrongAnswers   Int
+  createdAt      DateTime         @default(now())
+}
+
+model QuestionRecord {
+  id             String      @id @default(uuid())
+  quizAttemptId  String
+  quizAttempt    QuizAttempt @relation(fields: [quizAttemptId], references: [id])
+  questionId     String
+  question       Question    @relation(fields: [questionId], references: [id])
+  selectedOption Int
+  isCorrect      Boolean
+}
