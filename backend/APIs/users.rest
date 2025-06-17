@@ -1,0 +1,56 @@
+### Create User
+POST http://localhost:4000/graphql
+Content-Type: application/json
+
+{
+  "query": "mutation CreateUser($name: String!, $email: String!, $password: String!) { createUser(name: $name, email: $email, password: $password) { id, email } }",
+  "variables": {
+    "name": "Uncle Don",
+    "email": "testuser1@example.com",
+    "password": "securepassword123"
+  }
+}
+
+### Get User by ID
+POST http://localhost:4000/graphql
+Content-Type: application/json
+
+{
+  "query": "query ($id: ID!) { getUser(id: $id) { id, name, email } }",
+  "variables": {
+    "id": "ecc99441-f7b0-476e-8e79-7b51564a0d7d"
+  }
+}
+
+### Get All Users
+POST http://localhost:4000/graphql
+Content-Type: application/json
+
+{
+  "query": "{ getUsers { id, name, email } }"
+}
+
+### Update User
+POST http://localhost:4000/graphql
+Content-Type: application/json
+
+{
+  "query": "mutation UpdateUser($id: ID!, $name: String, $email: String, $password: String) { updateUser(id: $id, name: $name, email: $email, password: $password) { id, name, email } }",
+  "variables": {
+    "id": "b3749911-2e98-4104-9c68-e7193884bd4d",
+    "name": "Updated Name",
+    "email": "updatedemail@example.com",
+    "password": "newpassword123"
+  }
+}
+
+### Delete User
+POST http://localhost:4000/graphql
+Content-Type: application/json
+
+{
+  "query": "mutation DeleteUser($id: ID!) { deleteUser(id: $id) { id, name, email } }",
+  "variables": {
+    "id": "b3749911-2e98-4104-9c68-e7193884bd4d"
+  }
+}

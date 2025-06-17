@@ -8,12 +8,12 @@ import {
 export const resolvers = {
 	Query: {
 		hello: () => "Hello world!",
+		getUser,
+		getUsers,
 	},
 
 	Mutation: {
 		createUser,
-		getUser,
-		getUsers,
 		updateUser,
 		deleteUser,
 	},
