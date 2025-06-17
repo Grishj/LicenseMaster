@@ -10,7 +10,7 @@ import {
 } from "react-native";
 import axios from "axios";
 import Header from "../../components/common/Header";
-
+import { SafeAreaView } from "react-native-safe-area-context";
 const QuizScreen = ({ navigation }) => {
   const [questions, setQuestions] = useState([]);
   const [current, setCurrent] = useState(0);
@@ -176,95 +176,102 @@ const QuizScreen = ({ navigation }) => {
   const progressWidth = `${((current + 1) / questions.length) * 100}%`;
 
   return (
-    <View style={styles.container}>
-      <StatusBar barStyle="dark-content" />
+    <SafeAreaView style={styles.safeArea}>
+      <View style={styles.container}>
+        <StatusBar barStyle="dark-content" />
 
-      {/* Header */}
-      <Header
-        username="Grish"
-        onNotificationPress={() => console.log("Notification pressed")}
-        onBackPress={handleBack}
-      />
+        {/* Header */}
+        <Header
+          username="Grish"
+          showUsername={true}
+          showBackButton={true}
+          onBackPress={handleBack}
+        />
 
-      {/* Progress Bar */}
-      <View style={styles.progressContainer}>
-        <View style={styles.progressBar}>
-          <View style={[styles.progressFill, { width: progressWidth }]} />
-        </View>
-        <Text style={styles.progressText}>
-          {current + 1} of {questions.length}
-        </Text>
-      </View>
-
-      <ScrollView
-        style={styles.content}
-        showsVerticalScrollIndicator={false}
-        contentContainerStyle={styles.scrollContent}
-      >
-        {/* Timer */}
-        <View style={styles.timerContainer}>
-          <View
-            style={[styles.timerCircle, timeLeft <= 10 && styles.timerUrgent]}
-          >
-            <Text
-              style={[
-                styles.timerText,
-                timeLeft <= 10 && styles.timerTextUrgent,
-              ]}
-            >
-              {timeLeft}
-            </Text>
+        {/* Progress Bar */}
+        <View style={styles.progressContainer}>
+          <View style={styles.progressBar}>
+            <View style={[styles.progressFill, { width: progressWidth }]} />
           </View>
-          <Text style={styles.timerLabel}>seconds left</Text>
+          <Text style={styles.progressText}>
+            {current + 1} of {questions.length}
+          </Text>
         </View>
 
-        {/* Question */}
-        <View style={styles.questionContainer}>
-          <Text style={styles.question}>{q.question}</Text>
-        </View>
+        <ScrollView
+          style={styles.content}
+          showsVerticalScrollIndicator={false}
+          contentContainerStyle={styles.scrollContent}
+        >
+          {/* Timer */}
+          <View style={styles.timerContainer}>
+            <View
+              style={[styles.timerCircle, timeLeft <= 10 && styles.timerUrgent]}
+            >
+              <Text
+                style={[
+                  styles.timerText,
+                  timeLeft <= 10 && styles.timerTextUrgent,
+                ]}
+              >
+                {timeLeft}
+              </Text>
+            </View>
+            <Text style={styles.timerLabel}>seconds left</Text>
+          </View>
 
-        {/* Options */}
-        <View style={styles.optionsContainer}>
-          {q.options.map((option, index) => renderOption(option, index))}
-        </View>
+          {/* Question */}
+          <View style={styles.questionContainer}>
+            <Text style={styles.question}>{q.question}</Text>
+          </View>
 
-        {/* Explanation */}
+          {/* Options */}
+          <View style={styles.optionsContainer}>
+            {q.options.map((option, index) => renderOption(option, index))}
+          </View>
+
+          {/* Explanation */}
+          {selected !== null && (
+            <View style={styles.explanationContainer}>
+              <Text style={styles.explanationTitle}>💡 Explanation</Text>
+              <Text style={styles.explanationText}>{q.reason}</Text>
+            </View>
+          )}
+        </ScrollView>
+
+        {/* Action Buttons */}
         {selected !== null && (
-          <View style={styles.explanationContainer}>
-            <Text style={styles.explanationTitle}>💡 Explanation</Text>
-            <Text style={styles.explanationText}>{q.reason}</Text>
+          <View style={styles.buttonContainer}>
+            <TouchableOpacity
+              style={styles.backButton}
+              onPress={handleBack}
+              activeOpacity={0.8}
+            >
+              <Text style={[styles.buttonText, { color: "#6b7280" }]}>
+                ← Back
+              </Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={styles.nextButton}
+              onPress={handleNext}
+              activeOpacity={0.8}
+            >
+              <Text style={[styles.buttonText, { color: "#ffffff" }]}>
+                {current === questions.length - 1 ? "Finish 🎉" : "Next →"}
+              </Text>
+            </TouchableOpacity>
           </View>
         )}
-      </ScrollView>
-
-      {/* Action Buttons */}
-      {selected !== null && (
-        <View style={styles.buttonContainer}>
-          <TouchableOpacity
-            style={styles.backButton}
-            onPress={handleBack}
-            activeOpacity={0.8}
-          >
-            <Text style={[styles.buttonText, { color: "#6b7280" }]}>
-              ← Back
-            </Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={styles.nextButton}
-            onPress={handleNext}
-            activeOpacity={0.8}
-          >
-            <Text style={[styles.buttonText, { color: "#ffffff" }]}>
-              {current === questions.length - 1 ? "Finish 🎉" : "Next →"}
-            </Text>
-          </TouchableOpacity>
-        </View>
-      )}
-    </View>
+      </View>
+    </SafeAreaView>
   );
 };
 
 const styles = StyleSheet.create({
+  safeArea: {
+    flex: 1,
+    backgroundColor: "#fff", // Match your app's background color
+  },
   container: {
     flex: 1,
     backgroundColor: "#f8fafc",

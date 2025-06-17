@@ -10,4 +10,9 @@ export const Colors = {
   success: "#00c853",
   danger: "#d63031",
   black: "#000000", // ← add this line
+
+  light: "#FFFFFF",
+
+  // Dark Mode
+  darkBackground: "#121212",
 };
