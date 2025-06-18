@@ -1,6 +1,6 @@
 export const images = {
-  logo: require("../icon.png"),
-  quiz: require("../icon.png"),
+  logo: require("../License1.png"),
+  quiz: require("../License1.png"),
   syllabus: require("../syllabus.png"),
   notes: require("../notes.png"),
   leaderboard: require("../icon.png"),

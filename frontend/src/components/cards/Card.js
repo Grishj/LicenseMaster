@@ -1,6 +1,4 @@
-// src/components/cards/Card.js
-
-import React from "react";
+import React, { useRef, useEffect } from "react";
 import {
   View,
   Text,
@@ -8,191 +6,223 @@ import {
   StyleSheet,
   TouchableOpacity,
   Dimensions,
+  Animated,
+  Platform,
 } from "react-native";
+import { LinearGradient } from "expo-linear-gradient";
+import { Ionicons } from "@expo/vector-icons";
 
 const { width } = Dimensions.get("window");
 
-const Card = ({ title, icon, onPress, columns = 2 }) => {
-  const cardWidth = columns === 1 ? "100%" : "45%";
+const Card = ({ title, icon, onPress, columns = 2, index = 0 }) => {
+  const cardWidth = columns === 1 ? "100%" : "47%";
 
-  const getCardColors = (title) => {
-    const colorSchemes = {
-      Syllabus: { bg: "#6366f1", accent: "#4f46e5", shadow: "#6366f150" },
-      Notes: { bg: "#ec4899", accent: "#db2777", shadow: "#ec489950" },
-      "Past Questions": {
-        bg: "#06b6d4",
-        accent: "#0891b2",
-        shadow: "#06b6d450",
-      },
-      Events: { bg: "#10b981", accent: "#059669", shadow: "#10b98150" },
-      "Take Quiz": { bg: "#f59e0b", accent: "#d97706", shadow: "#f59e0b50" },
-      "Computer Graphics": {
-        bg: "#8b5cf6",
-        accent: "#7c3aed",
-        shadow: "#8b5cf650",
-      },
-      "Computer Networks": {
-        bg: "#ef4444",
-        accent: "#dc2626",
-        shadow: "#ef444450",
-      },
-      "Data Structures": {
-        bg: "#3b82f6",
-        accent: "#2563eb",
-        shadow: "#3b82f650",
-      },
-      Drawing: { bg: "#f97316", accent: "#ea580c", shadow: "#f9731650" },
-      default: { bg: "#6366f1", accent: "#4f46e5", shadow: "#6366f150" },
+  // Animation values
+  const scaleAnim = useRef(new Animated.Value(0.9)).current;
+  const fadeAnim = useRef(new Animated.Value(0)).current;
+
+  useEffect(() => {
+    Animated.parallel([
+      Animated.timing(fadeAnim, {
+        toValue: 1,
+        duration: 600,
+        delay: index * 100,
+        useNativeDriver: true,
+      }),
+      Animated.spring(scaleAnim, {
+        toValue: 1,
+        friction: 4,
+        delay: index * 100,
+        useNativeDriver: true,
+      }),
+    ]).start();
+  }, []);
+
+  const getCardGradient = (title) => {
+    const gradients = {
+      Syllabus: ["#00d4ff", "#0077cc", "#005299"],
+      Notes: ["#ff006e", "#c10055", "#8b0041"],
+      "Past Questions": ["#06ffa5", "#00cc84", "#009963"],
+      Events: ["#ffb700", "#ff8c00", "#ff6200"],
+      "Take Quiz": ["#a855f7", "#7c3aed", "#6d28d9"],
+      default: ["#00d4ff", "#0077cc", "#005299"],
     };
-    return colorSchemes[title] || colorSchemes.default;
+    return gradients[title] || gradients.default;
   };
 
-  const colors = getCardColors(title);
+  const getIconName = (title) => {
+    const icons = {
+      Syllabus: "book-outline",
+      Notes: "document-text-outline",
+      "Past Questions": "time-outline",
+      Events: "calendar-outline",
+      "Take Quiz": "trophy-outline",
+    };
+    return icons[title] || "grid-outline";
+  };
+
+  const gradientColors = getCardGradient(title);
 
   return (
-    <TouchableOpacity
+    <Animated.View
       style={[
         styles.cardContainer,
         {
           width: cardWidth,
-          shadowColor: colors.shadow,
+          opacity: fadeAnim,
+          transform: [{ scale: scaleAnim }],
         },
       ]}
-      onPress={onPress}
-      activeOpacity={0.8}
     >
-      <View style={[styles.card, { backgroundColor: colors.bg }]}>
-        {/* Modern glass overlay */}
-        <View style={styles.glassOverlay}>
-          {/* Accent stripe for modern look */}
-          <View
-            style={[styles.accentStripe, { backgroundColor: colors.accent }]}
-          />
-
-          {/* Icon container */}
-          <View style={styles.iconContainer}>
-            {icon && <Image source={icon} style={styles.icon} />}
-            <View
-              style={[
-                styles.iconBackground,
-                { backgroundColor: colors.accent },
-              ]}
-            />
+      <TouchableOpacity
+        onPress={onPress}
+        activeOpacity={0.9}
+        style={styles.touchable}
+      >
+        <LinearGradient
+          colors={gradientColors}
+          start={{ x: 0, y: 0 }}
+          end={{ x: 1, y: 1 }}
+          style={styles.card}
+        >
+          {/* Background decoration */}
+          <View style={styles.cardDecoration}>
+            <View style={styles.circle1} />
+            <View style={styles.circle2} />
           </View>
 
-          {/* Title */}
-          <Text style={styles.title}>{title}</Text>
+          {/* Glass overlay effect */}
+          <LinearGradient
+            colors={["rgba(255, 255, 255, 0.1)", "rgba(255, 255, 255, 0.05)"]}
+            style={styles.glassOverlay}
+          >
+            {/* Icon container with glow */}
+            <View style={styles.iconContainer}>
+              <View style={styles.iconGlow} />
+              <View style={styles.iconCircle}>
+                <Ionicons name={getIconName(title)} size={32} color="#ffffff" />
+              </View>
+            </View>
 
-          {/* Modern decorative elements */}
-          <View
-            style={[styles.decorativeDot1, { backgroundColor: colors.accent }]}
-          />
-          <View
-            style={[styles.decorativeDot2, { backgroundColor: colors.accent }]}
-          />
+            {/* Title */}
+            <Text style={styles.title}>{title}</Text>
 
-          {/* Subtle highlight */}
-          <View style={styles.highlight} />
-        </View>
-      </View>
-    </TouchableOpacity>
+            {/* Arrow indicator */}
+            <View style={styles.arrowContainer}>
+              <Text style={styles.arrow}>→</Text>
+            </View>
+          </LinearGradient>
+        </LinearGradient>
+      </TouchableOpacity>
+    </Animated.View>
   );
 };
 
 const styles = StyleSheet.create({
   cardContainer: {
-    marginHorizontal: 8,
-    marginVertical: 8,
-    shadowOffset: {
-      width: 0,
-      height: 8,
-    },
-    shadowOpacity: 0.15,
-    shadowRadius: 12,
-    elevation: 8,
+    marginBottom: 16,
+    height: 140,
+  },
+  touchable: {
+    flex: 1,
+    borderRadius: 20,
+    overflow: "hidden",
+    ...Platform.select({
+      ios: {
+        shadowColor: "#000",
+        shadowOffset: { width: 0, height: 4 },
+        shadowOpacity: 0.2,
+        shadowRadius: 10,
+      },
+      android: {
+        elevation: 8,
+      },
+    }),
   },
   card: {
+    flex: 1,
     borderRadius: 20,
-    minHeight: 110,
     position: "relative",
     overflow: "hidden",
   },
+  cardDecoration: {
+    position: "absolute",
+    width: "100%",
+    height: "100%",
+  },
+  circle1: {
+    position: "absolute",
+    width: 80,
+    height: 80,
+    borderRadius: 40,
+    backgroundColor: "rgba(255, 255, 255, 0.1)",
+    top: -20,
+    right: -20,
+  },
+  circle2: {
+    position: "absolute",
+    width: 60,
+    height: 60,
+    borderRadius: 30,
+    backgroundColor: "rgba(255, 255, 255, 0.08)",
+    bottom: -15,
+    left: -15,
+  },
   glassOverlay: {
     flex: 1,
+    padding: 20,
+    justifyContent: "space-between",
+    borderWidth: 1,
+    borderColor: "rgba(255, 255, 255, 0.2)",
+    borderRadius: 20,
+  },
+  iconContainer: {
+    alignItems: "center",
+    justifyContent: "center",
+    marginBottom: 8,
+  },
+  iconGlow: {
+    position: "absolute",
+    width: 70,
+    height: 70,
+    borderRadius: 35,
+    backgroundColor: "rgba(255, 255, 255, 0.1)",
+  },
+  iconCircle: {
+    width: 56,
+    height: 56,
+    borderRadius: 28,
     backgroundColor: "rgba(255, 255, 255, 0.15)",
     justifyContent: "center",
     alignItems: "center",
-    padding: 16,
-    position: "relative",
-  },
-  accentStripe: {
-    position: "absolute",
-    top: 0,
-    right: 0,
-    width: 4,
-    height: "100%",
-    opacity: 0.8,
-  },
-  iconContainer: {
-    position: "relative",
-    marginBottom: 12,
-    zIndex: 3,
-  },
-  icon: {
-    width: 36,
-    height: 36,
-    resizeMode: "contain",
-    zIndex: 2,
-  },
-  iconBackground: {
-    position: "absolute",
-    top: -6,
-    left: -6,
-    right: -6,
-    bottom: -6,
-    borderRadius: 24,
-    opacity: 0.2,
-    zIndex: 1,
+    borderWidth: 1,
+    borderColor: "rgba(255, 255, 255, 0.3)",
   },
   title: {
-    fontSize: 13,
-    fontWeight: "600",
+    fontSize: 16,
+    fontWeight: "700",
     color: "#ffffff",
     textAlign: "center",
-    letterSpacing: 0.2,
-    lineHeight: 16,
+    letterSpacing: 0.5,
     textShadowColor: "rgba(0, 0, 0, 0.3)",
     textShadowOffset: { width: 0, height: 1 },
-    textShadowRadius: 2,
-    zIndex: 2,
+    textShadowRadius: 3,
   },
-  decorativeDot1: {
+  arrowContainer: {
     position: "absolute",
-    top: 12,
-    right: 12,
-    width: 6,
-    height: 6,
-    borderRadius: 3,
-    opacity: 0.4,
+    bottom: 16,
+    right: 16,
+    width: 24,
+    height: 24,
+    borderRadius: 12,
+    backgroundColor: "rgba(255, 255, 255, 0.2)",
+    justifyContent: "center",
+    alignItems: "center",
   },
-  decorativeDot2: {
-    position: "absolute",
-    bottom: 12,
-    left: 12,
-    width: 4,
-    height: 4,
-    borderRadius: 2,
-    opacity: 0.3,
-  },
-  highlight: {
-    position: "absolute",
-    top: 0,
-    left: 0,
-    right: 0,
-    height: 2,
-    backgroundColor: "rgba(255, 255, 255, 0.4)",
-    borderTopLeftRadius: 20,
-    borderTopRightRadius: 20,
+  arrow: {
+    color: "#ffffff",
+    fontSize: 16,
+    fontWeight: "bold",
   },
 });
 
